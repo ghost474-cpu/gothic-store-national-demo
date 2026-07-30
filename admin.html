@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gothic Sanctuary | Admin Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .admin-container {
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: #121212;
+            border: 1px solid var(--gold, #d4af37);
+            border-radius: 8px;
+            color: #fff;
+        }
+        .login-box { text-align: center; }
+        .form-group { margin-bottom: 1.2rem; text-align: left; }
+        .form-group label { display: block; margin-bottom: 0.5rem; color: var(--gold, #d4af37); }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 0.8rem;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            color: #fff;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .btn-group { display: flex; gap: 0.5rem; }
+        .btn-warning {
+            background-color: #d4af37;
+            color: #121212;
+            font-weight: bold;
+            border: none;
+            padding: 0.5rem 0.8rem;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .btn-danger {
+            background-color: #a81c1c;
+            color: white;
+            border: none;
+            padding: 0.5rem 0.8rem;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .btn-cancel {
+            background-color: #444;
+            color: white;
+            border: none;
+            padding: 0.8rem;
+            cursor: pointer;
+            border-radius: 4px;
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+        .hidden { display: none; }
+        .product-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem;
+            border-bottom: 1px solid #333;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="admin-container">
+        <!-- 🔒 تسجيل الدخول -->
+        <div id="login-section" class="login-box">
+            <h2>𝕬𝖉𝖒𝖎𝖓 𝕬𝖈𝖈𝖊𝖘𝖘</h2>
+            <p>Enter password to manage relics</p>
+            <div class="form-group">
+                <input type="password" id="admin-pass" placeholder="Password...">
+            </div>
+            <button id="btn-login" class="btn btn-primary" onclick="checkPassword()">Login</button>
+            <p id="login-error" style="color: red; display: none; margin-top: 1rem;">Incorrect Password!</p>
+        </div>
+
+        <!-- 🛠️ لوحة التحكم -->
+        <div id="dashboard-section" class="hidden">
+            <h2 id="form-title">Add New Relic</h2>
+            <form id="add-product-form" onsubmit="handleFormSubmit(event)">
+                <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" id="p-title" placeholder="e.g. Ring of Shadows" required>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="p-desc" rows="3" placeholder="Relic description..." required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Price</label>
+                    <input type="text" id="p-price" placeholder="e.g. 1500DA" required>
+                </div>
+                <div class="form-group">
+                    <label>Image File (Upload to Supabase Storage)</label>
+                    <input type="file" id="p-image-file" accept="image/*">
+                    <input type="text" id="p-image-url" placeholder="Or paste image URL directly..." style="margin-top: 0.5rem;">
+                </div>
+                
+                <button type="submit" id="submit-btn" class="btn btn-primary">Save Relic</button>
+                <button type="button" id="cancel-edit-btn" class="btn-cancel hidden" onclick="resetForm()">Cancel Edit</button>
+            </form>
+
+            <hr style="border-color: #333; margin: 2rem 0;">
+
+            <h3>Current Relics</h3>
+            <div id="products-list-admin"></div>
+        </div>
+    </div>
+
+<script>
+    const SUPABASE_URL = "https://yskyapmyenvkfejbicav.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlza3lhcG15ZW52a2ZlamJpY2F2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzNjI4MzksImV4cCI6MjEwMDkzODgzOX0.Mhe6AyfRO08AJrdu-NCdJhBfNpjQvyL4PbHifq7Sl3k";
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let loadedProducts = []; 
+    const ADMIN_PASSWORD = "goth"; 
+    let editingId = null;
+
+    document.addEventListener("keydown", function(event) {
+        if (event.key === "Enter" && !document.getElementById("login-section").classList.contains("hidden")) {
+            event.preventDefault();
+            document.getElementById("btn-login").click();
+        }
+    });
+
+    function checkPassword() {
+        const inputPass = document.getElementById("admin-pass").value;
+        if (inputPass === ADMIN_PASSWORD) {
+            document.getElementById("login-section").classList.add("hidden");
+            document.getElementById("dashboard-section").classList.remove("hidden");
+            loadAdminProducts();
+        } else {
+            document.getElementById("login-error").style.display = "block";
+        }
+    }
+
+    // رفع الصورة لـ Supabase Storage باستخدام اسم الـ Bucket المطابق: RELICS
+    async function uploadImageToStorage(file) {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 7)}.${fileExt}`;
+        const filePath = `product-images/${fileName}`;
+
+        const { data, error } = await supabaseClient
+            .storage
+            .from('RELICS')
+            .upload(filePath, file);
+
+        if (error) {
+            console.error("Storage upload error:", error);
+            alert("Error uploading image file: " + error.message);
+            return null;
+        }
+
+        // رابط الصورة العام بعد الرفع
+        const { data: publicUrlData } = supabaseClient
+            .storage
+            .from('RELICS')
+            .getPublicUrl(filePath);
+
+        return publicUrlData.publicUrl;
+    }
+
+    async function loadAdminProducts() {
+        const listContainer = document.getElementById("products-list-admin");
+        listContainer.innerHTML = "<p style='color:#888;'>Loading relics from cloud...</p>";
+
+        const { data: products, error } = await supabaseClient
+            .from('products')
+            .select('*')
+            .order('id', { ascending: false });
+
+        if (error) {
+            listContainer.innerHTML = "<p style='color:red;'>Error fetching products from Supabase.</p>";
+            return;
+        }
+
+        loadedProducts = products || [];
+        listContainer.innerHTML = "";
+        
+        if (loadedProducts.length === 0) {
+            listContainer.innerHTML = "<p>No relics found in database.</p>";
+            return;
+        }
+
+        loadedProducts.forEach((prod) => {
+            const item = document.createElement("div");
+            item.className = "product-item";
+            item.innerHTML = `
+                <div>
+                    <strong>${escapeHtml(prod.title)}</strong> - ${escapeHtml(prod.price)}
+                </div>
+                <div class="btn-group">
+                    <button class="btn-warning" onclick="startEdit(${prod.id})">Edit</button>
+                    <button class="btn-danger" onclick="deleteProduct(${prod.id})">Delete</button>
+                </div>
+            `;
+            listContainer.appendChild(item);
+        });
+    }
+
+    function startEdit(id) {
+        const prod = loadedProducts.find(p => p.id === id);
+        if (prod) editProduct(prod);
+    }
+
+    function escapeHtml(str) {
+        return (str || '').replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    async function handleFormSubmit(event) {
+        event.preventDefault();
+        
+        const submitBtn = document.getElementById("submit-btn");
+        submitBtn.innerText = "Processing & Saving...";
+        submitBtn.disabled = true;
+
+        const title = document.getElementById("p-title").value;
+        const description = document.getElementById("p-desc").value;
+        const price = document.getElementById("p-price").value;
+        const urlInput = document.getElementById("p-image-url").value;
+        const fileInput = document.getElementById("p-image-file");
+
+        let imageUrl = urlInput;
+
+        // رفع الملف إن وُجد
+        if (fileInput.files.length > 0) {
+            const uploadedUrl = await uploadImageToStorage(fileInput.files[0]);
+            if (uploadedUrl) {
+                imageUrl = uploadedUrl;
+            } else {
+                submitBtn.innerText = "Save Relic";
+                submitBtn.disabled = false;
+                return;
+            }
+        }
+
+        if (editingId === null) {
+            const finalImage = imageUrl || "ring.PNG";
+            const { error } = await supabaseClient
+                .from('products')
+                .insert([{ title, description, price, image: finalImage }]);
+
+            if (error) {
+                alert("Error adding relic: " + error.message);
+            } else {
+                alert("Relic added successfully!");
+            }
+        } else {
+            let updateData = { title, description, price };
+            if (imageUrl) {
+                updateData.image = imageUrl;
+            }
+
+            const { error } = await supabaseClient
+                .from('products')
+                .update(updateData)
+                .eq('id', editingId);
+
+            if (error) {
+                alert("Error updating relic: " + error.message);
+            } else {
+                alert("Relic updated successfully!");
+            }
+        }
+
+        submitBtn.innerText = "Save Relic";
+        submitBtn.disabled = false;
+        resetForm();
+        loadAdminProducts();
+    }
+
+    function editProduct(prod) {
+        editingId = prod.id;
+
+        document.getElementById("p-title").value = prod.title || "";
+        document.getElementById("p-desc").value = prod.description || "";
+        document.getElementById("p-price").value = prod.price || "";
+        document.getElementById("p-image-url").value = prod.image && prod.image.startsWith("http") ? prod.image : "";
+
+        document.getElementById("form-title").innerText = "Edit Relic";
+        document.getElementById("submit-btn").innerText = "Update Relic";
+        document.getElementById("cancel-edit-btn").classList.remove("hidden");
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function resetForm() {
+        editingId = null;
+        document.getElementById("add-product-form").reset();
+        document.getElementById("form-title").innerText = "Add New Relic";
+        document.getElementById("submit-btn").innerText = "Save Relic";
+        document.getElementById("cancel-edit-btn").classList.add("hidden");
+    }
+
+    async function deleteProduct(id) {
+        if (!confirm("Are you sure you want to delete this relic?")) return;
+
+        const { error } = await supabaseClient
+            .from('products')
+            .delete()
+            .eq('id', id);
+
+        if (error) {
+            alert("Error deleting relic: " + error.message);
+        } else {
+            alert("Relic deleted successfully!");
+            resetForm();
+            loadAdminProducts();
+        }
+    }
+</script>
+</body>
+</html>
