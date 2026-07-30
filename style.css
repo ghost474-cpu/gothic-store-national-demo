@@ -1,0 +1,427 @@
+/* ==========================================
+   Gothic E-Commerce Store - Clean CSS
+   ========================================== */
+
+:root {
+    --bg-main: #0a0a0c;
+    --card-bg: #121015;
+    --accent-red: #a71d2a;
+    --accent-hover: #d32f2f;
+    --gold: #c5a059;
+    --text-color: #f0ece1;
+    --text-muted: #b0a8a0;
+    --border-color: #26202c;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg-main);
+    color: var(--text-color);
+    font-family: 'Faustina', serif;
+    line-height: 1.6;
+}
+
+.container {
+    width: 90%;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+/* Header */
+.header {
+    background-color: #050507;
+    border-bottom: 1px solid var(--border-color);
+    padding: 1rem 0;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-family: 'Cinzel Decorative', 'Cinzel', serif;
+    color: var(--gold);
+    font-size: 1.6rem;
+}
+
+.cart-icon-btn {
+    cursor: pointer;
+    background-color: var(--card-bg);
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    color: var(--gold);
+    transition: 0.3s;
+}
+
+.cart-icon-btn:hover {
+    border-color: var(--accent-red);
+    box-shadow: 0 0 8px rgba(167, 29, 42, 0.4);
+}
+
+/* Main & Grid */
+.main-content {
+    padding: 3rem 0;
+}
+
+.section-title {
+    font-family: 'Cinzel Decorative', 'Cinzel', serif;
+    text-align: center;
+    color: var(--gold);
+    margin-bottom: 2rem;
+    letter-spacing: 1px;
+}
+
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 2rem;
+}
+
+.product-card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    padding: 1.2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    border-radius: 12px;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--accent-red);
+    box-shadow: 0 5px 15px rgba(167, 29, 42, 0.25);
+}
+
+/* Fix Product Image Sizing */
+.product-image-placeholder {
+    width: 100%;
+    height: 220px;
+    background-color: #050507;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.product-image-placeholder img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    transition: transform 0.4s ease;
+}
+
+.product-card:hover .product-image-placeholder img {
+    transform: scale(1.04);
+}
+
+.product-title {
+    font-family: 'Cinzel', serif;
+    color: var(--text-color);
+    font-size: 1.15rem;
+    margin-bottom: 0.5rem;
+}
+
+.product-description {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+.product-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.product-price {
+    color: var(--gold);
+    font-weight: bold;
+    font-size: 1.15rem;
+    font-family: 'Cinzel', serif;
+}
+
+.btn-primary {
+    background-color: var(--accent-red);
+    color: #fff;
+    border: 1px solid var(--accent-red);
+    padding: 0.55rem 1.1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: 'Cinzel', serif;
+    font-weight: 600;
+    transition: 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: transparent;
+    color: var(--gold);
+    border-color: var(--gold);
+    box-shadow: 0 0 10px rgba(197, 160, 89, 0.3);
+}
+
+/* Modal Cart Sidebar */
+.cart-modal {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 380px;
+    max-width: 100%;
+    height: 100vh;
+    background-color: var(--card-bg);
+    border-left: 1px solid var(--border-color);
+    z-index: 1000;
+    transition: right 0.4s ease;
+    padding: 1.5rem;
+    box-shadow: -5px 0 20px rgba(0, 0, 0, 0.8);
+    display: flex;
+    flex-direction: column;
+}
+
+.cart-modal.active {
+    right: 0;
+}
+
+.cart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.8rem;
+    margin-bottom: 1rem;
+}
+
+.cart-header h3 {
+    font-family: 'Cinzel', serif;
+    color: var(--gold);
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1.8rem;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.close-btn:hover {
+    color: var(--accent-red);
+}
+
+/* Scrollable Container Inside Cart */
+.cart-content {
+    max-height: calc(100vh - 80px);
+    overflow-y: auto;
+    padding-right: 6px;
+}
+
+/* Custom Scrollbar for Cart */
+.cart-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.cart-content::-webkit-scrollbar-track {
+    background: #09080b;
+}
+
+.cart-content::-webkit-scrollbar-thumb {
+    background: var(--accent-red);
+    border-radius: 4px;
+}
+
+.cart-content::-webkit-scrollbar-thumb:hover {
+    background: var(--gold);
+}
+
+.cart-total {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.1rem;
+    margin: 1rem 0;
+    padding-top: 0.8rem;
+    border-top: 1px dashed var(--border-color);
+    color: var(--gold);
+    font-family: 'Cinzel', serif;
+}
+
+/* Form & Inputs */
+.checkout-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    margin-top: 1rem;
+}
+
+.checkout-form h4 {
+    font-family: 'Cinzel', serif;
+    color: var(--gold);
+    margin-bottom: 0.2rem;
+}
+
+.checkout-form input {
+    width: 100%;
+    background-color: #08070a;
+    border: 1px solid var(--border-color);
+    padding: 0.68rem;
+    color: var(--text-color);
+    border-radius: 6px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.checkout-form input:focus {
+    border-color: var(--gold);
+}
+
+.form-group {
+    width: 100%;
+}
+
+.form-label {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--gold);
+    margin-bottom: 4px;
+    font-family: 'Faustina', serif;
+}
+
+/* Gothic Select Menu */
+.gothic-select {
+    width: 100%;
+    padding: 0.68rem;
+    background-color: #08070a;
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.3s;
+    cursor: pointer;
+}
+
+.gothic-select:focus {
+    border-color: var(--gold);
+}
+
+.gothic-select option {
+    background-color: #121015;
+    color: var(--text-color);
+}
+
+/* Gothic Textarea Styling */
+.gothic-textarea {
+    width: 100%;
+    padding: 10px 12px;
+    background-color: #08070a;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    color: var(--text-color);
+    font-family: inherit;
+    font-size: 0.9rem;
+    resize: vertical;
+    min-height: 80px;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.gothic-textarea:focus {
+    outline: none;
+    border-color: var(--gold);
+    box-shadow: 0 0 5px rgba(197, 160, 89, 0.3);
+}
+
+/* Delivery Options Group */
+.delivery-options-group {
+    margin: 8px 0;
+    padding: 10px;
+    background: rgba(8, 7, 10, 0.8);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+}
+
+.checkbox-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    gap: 10px;
+    margin-top: 6px;
+}
+
+.custom-checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.9rem;
+    color: var(--text-color);
+    cursor: pointer;
+    user-select: none;
+}
+
+.gothic-radio {
+    accent-color: var(--accent-red);
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+/* Footer */
+.footer {
+    background-color: #040405;
+    border-top: 1px solid var(--border-color);
+    padding-top: 2rem;
+    margin-top: 3rem;
+}
+
+.footer-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+    padding-bottom: 2rem;
+}
+
+.footer-brand h3, .footer-links h4, .footer-contact h4 {
+    font-family: 'Cinzel', serif;
+    color: var(--gold);
+    margin-bottom: 1rem;
+}
+
+.footer-links ul {
+    list-style: none;
+}
+
+.footer-links a {
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.footer-links a:hover {
+    color: var(--accent-red);
+}
+
+.footer-bottom {
+    text-align: center;
+    border-top: 1px solid var(--border-color);
+    padding: 1rem 0;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
