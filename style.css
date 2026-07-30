@@ -82,10 +82,12 @@ body {
     letter-spacing: 1px;
 }
 
+/* تعديل الشبكة لضبط أحجام الكروت بشكل مثالي متناسق */
 .products-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 2rem;
+    justify-content: center;
 }
 
 .product-card {
@@ -97,6 +99,7 @@ body {
     justify-content: space-between;
     transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
     border-radius: 12px;
+    width: 100%;
 }
 
 .product-card:hover {
@@ -105,10 +108,10 @@ body {
     box-shadow: 0 5px 15px rgba(167, 29, 42, 0.25);
 }
 
-/* Fix Product Image Sizing */
+/* ضبط حجم إطار الصورة لمنع التمدد والعرض التشوهي */
 .product-image-placeholder {
     width: 100%;
-    height: 220px;
+    height: 240px;
     background-color: #050507;
     border: 1px solid var(--border-color);
     border-radius: 8px;
@@ -128,7 +131,7 @@ body {
 }
 
 .product-card:hover .product-image-placeholder img {
-    transform: scale(1.04);
+    transform: scale(1.05);
 }
 
 .product-title {
@@ -142,12 +145,15 @@ body {
     color: var(--text-muted);
     font-size: 0.9rem;
     margin-bottom: 1rem;
+    line-height: 1.4;
 }
 
 .product-bottom {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-top: auto;
+    padding-top: 0.5rem;
 }
 
 .product-price {
