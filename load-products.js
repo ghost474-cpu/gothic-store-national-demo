@@ -1,4 +1,3 @@
-// ضع بيانات مشروعك مباشرة هنا (هذا المفتاح عام وآمن للظهور)
 const SUPABASE_URL = "https://yskyapmyenvkfejbicav.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlza3lhcG15ZW52a2ZlamJpY2F2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzNjI4MzksImV4cCI6MjEwMDkzODgzOX0.Mhe6AyfRO08AJrdu-NCdJhBfNpjQvyL4PbHifq7Sl3k";
 
